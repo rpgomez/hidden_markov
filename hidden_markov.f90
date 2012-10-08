@@ -19,12 +19,12 @@ subroutine alphapass(alpha,sigma,A,B,pi,observed,N,T,S)
       alpha(:,0) = alpha(:,0)/sigma(0)
 
 ! now do the remainder
-      do 10 i = 1,T-1
+      do i = 1,T-1
          alpha(:,i) = matmul(A,alpha(:,i-1))
          alpha(:,i) = alpha(:,i)*B(observed(i),:)
          sigma(i) = sum(alpha(:,i))
          alpha(:,i) = alpha(:,i)/sigma(i)
- 10   continue
+      end do
 
 end
 subroutine betapass(beta,sigma,A,B,pi,observed,N,T,S)
@@ -49,9 +49,9 @@ subroutine betapass(beta,sigma,A,B,pi,observed,N,T,S)
       beta(:,T-1) = 1.
 
 ! now do the remainder
-      do 10 i = T-2,0,-1
+      do i = T-2,0,-1
          beta(:,i-1) = matmul(At,beta(:,i)*B(observed(i),:))/sigma(i)
- 10   continue
+      end do
 
 end
 subroutine gammapass(alpha,beta,gamma,N,T)
