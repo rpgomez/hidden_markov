@@ -68,3 +68,62 @@ subroutine gammapass(alpha,beta,gamma,N,T)
          gamma(:,i) = gamma(:,i)/totalsum
       end do
       end subroutine
+
+subroutine generate_data(observed,hidden,pi,A,B,N,S,T)
+      integer :: N, S, T
+      real, dimension(0:N-1):: pi
+      real, dimension(0:N-1,0:N-1):: A
+      real, dimension(0:S-1,0:N-1):: B
+      integer, dimension(0:T-1) :: observed,hidden
+      integer :: i
+
+!f2py intent(out) :: observed, hidden
+!f2py intent(hide), depend(pi) :: N = size(pi)
+!f2py intent(hide), depend(B)  :: S = size(B,1)
+      interface
+         subroutine grn(X,R)
+         real, dimension(:) :: X
+         integer :: R
+         end subroutine grn
+      end interface
+      call random_seed
+
+      ! initial hidden state
+      call grn(pi,hidden(0))
+
+      ! initial observed state
+      call grn(B(:,hidden(0)),observed(0))
+
+      ! now do the rest of the sequence
+      do i = 1, T-1
+         call grn(A(:,hidden(i-1)),hidden(i))
+         call grn(B(:,hidden(i)),observed(i))
+      end do
+      end subroutine
+
+subroutine grn(X, R)
+! generates a random number with value 0...len(X)-1
+      real, dimension(:) :: X
+      real, dimension(:), allocatable :: cdf
+      integer :: N, R, i
+      real harvest
+      N = size(X)
+      allocate(cdf(N))
+
+      cdf(1) = X(1)
+      do i = 2, N
+         cdf(i) = cdf(i-1) + X(i)
+      end do
+
+! Now generate a number and determine it's location.
+      call random_number(harvest)
+      do i = 1, N
+         if (harvest <= cdf(i)) then
+            R = i-1
+            exit
+         end if
+      end do
+      deallocate(cdf)
+      return
+      end subroutine
+
