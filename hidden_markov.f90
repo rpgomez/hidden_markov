@@ -26,7 +26,7 @@ subroutine alphapass(alpha,sigma,A,B,pi,observed,N,T,S)
          alpha(:,i) = alpha(:,i)/sigma(i)
       end do
 
-end
+      end subroutine
 subroutine betapass(beta,sigma,A,B,observed,N,T,S)
       integer :: N,T,S
       real, dimension(0:N-1,0:T-1) :: beta
@@ -51,8 +51,8 @@ subroutine betapass(beta,sigma,A,B,observed,N,T,S)
       do i = T-2,0,-1
          beta(:,i-1) = matmul(At,beta(:,i)*B(observed(i),:))/sigma(i)
       end do
+      end subroutine
 
-end
 subroutine gammapass(alpha,beta,gamma,N,T)
       integer :: N,T
       real, dimension(0:N-1,0:T-1) :: alpha,beta,gamma
@@ -62,9 +62,9 @@ subroutine gammapass(alpha,beta,gamma,N,T)
 !f2py intent(hide), depend(alpha)  :: N = size(alpha,1)
 !f2py intent(hide), depend(alpha)  :: T = size(alpha,2)
 
-         gamma = alpha*beta
-         do 10 i = 0, T-1
-            totalsum= gamma(:,i)
-            gamma(:,i)/totalsum
- 10      continue
-end
+      gamma = alpha*beta
+      do i = 0, T-1
+         totalsum= sum(gamma(:,i))
+         gamma(:,i) = gamma(:,i)/totalsum
+      end do
+      end subroutine
