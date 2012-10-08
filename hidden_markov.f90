@@ -27,12 +27,11 @@ subroutine alphapass(alpha,sigma,A,B,pi,observed,N,T,S)
       end do
 
 end
-subroutine betapass(beta,sigma,A,B,pi,observed,N,T,S)
+subroutine betapass(beta,sigma,A,B,observed,N,T,S)
       integer :: N,T,S
       real, dimension(0:N-1,0:T-1) :: beta
       real, dimension(0:N-1,0:N-1) :: A
       real, dimension(0:S-1,0:N-1) :: B
-      real, dimension(0:N-1) :: pi
       integer, dimension(0:T-1) :: observed
       real, dimension(0:T-1) :: sigma
       integer :: i
