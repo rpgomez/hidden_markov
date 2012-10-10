@@ -48,7 +48,7 @@ subroutine betapass(beta,sigma,A,B,observed,N,T,S)
       beta(:,T-1) = 1.
 
 ! now do the remainder
-      do i = T-2,0,-1
+      do i = T-1,1,-1
          beta(:,i-1) = matmul(At,beta(:,i)*B(observed(i),:))/sigma(i)
       end do
       end subroutine
