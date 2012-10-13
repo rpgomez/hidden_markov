@@ -1,80 +1,87 @@
+! A(i,j) == Pr( hidden i -> hidden j)
+! B(i,j) == Pr( observed j | hidden i)
+
 subroutine alphapass(alpha,sigma,A,B,pi,observed,N,T,S)
       integer :: N,T,S
-      real, dimension(0:N-1,0:T-1) :: alpha
-      real, dimension(0:N-1,0:N-1) :: A
-      real, dimension(0:S-1,0:N-1) :: B
-      real, dimension(0:N-1) :: pi
-      integer, dimension(0:T-1) :: observed
-      real, dimension(0:T-1) :: sigma
+      real, dimension(N,T) :: alpha
+      real, dimension(N,N) :: A
+      real, dimension(N,S) :: B
+      real, dimension(N) :: pi
+      integer, dimension(T) :: observed
+      real, dimension(T) :: sigma
       integer :: i
 !f2py intent(out) :: alpha, sigma
 !f2py intent(hide), depend(A)  :: N = size(A,1)
 !f2py intent(hide), depend(observed) :: T = size(observed)
-!f2py intent(hide), depend(B) :: S = size(B,1)
+!f2py intent(hide), depend(B) :: S = size(B,2)
 
 ! initial iteration
-      alpha(:,0) = pi
-      alpha(:,0) = alpha(:,0)*B(observed(0),:)
-      sigma(0) = sum(alpha(:,0))
-      alpha(:,0) = alpha(:,0)/sigma(0)
+      alpha(:,1) = pi
+      alpha(:,1) = alpha(:,1)*B(:,observed(1))
+      sigma(1) = sum(alpha(:,1))
+      alpha(:,1) = alpha(:,1)/sigma(1)
 
 ! now do the remainder
-      do i = 1,T-1
-         alpha(:,i) = matmul(A,alpha(:,i-1))
-         alpha(:,i) = alpha(:,i)*B(observed(i),:)
+      do i = 2,T
+         alpha(:,i) = matmul(alpha(:,i-1),A)
+         alpha(:,i) = alpha(:,i)*B(:,observed(i))
          sigma(i) = sum(alpha(:,i))
          alpha(:,i) = alpha(:,i)/sigma(i)
       end do
-
       end subroutine
+
+! A(i,j) == Pr( hidden i -> hidden j)
+! B(i,j) == Pr( observed j | hidden i)
 subroutine betapass(beta,sigma,A,B,observed,N,T,S)
       integer :: N,T,S
-      real, dimension(0:N-1,0:T-1) :: beta
-      real, dimension(0:N-1,0:N-1) :: A
-      real, dimension(0:S-1,0:N-1) :: B
-      integer, dimension(0:T-1) :: observed
-      real, dimension(0:T-1) :: sigma
+      real, dimension(N,T) :: beta
+      real, dimension(N,N) :: A
+      real, dimension(N,S) :: B
+      integer, dimension(T) :: observed
+      real, dimension(T) :: sigma
       integer :: i
-      real, dimension(0:N-1,0:N-1) :: At
+      real, dimension(N,N) :: At
 
 !f2py intent(out) :: beta
 !f2py intent(hide), depend(A)  :: N = size(A,1)
 !f2py intent(hide), depend(observed) :: T = size(observed)
-!f2py intent(hide), depend(B) :: S = size(B,1)
+!f2py intent(hide), depend(B) :: S = size(B,2)
 
       At = transpose(A)
 
 ! initial iteration
-      beta(:,T-1) = 1.
+      beta(:,T) = 1.
 
 ! now do the remainder
-      do i = T-1,1,-1
-         beta(:,i-1) = matmul(At,beta(:,i)*B(observed(i),:))/sigma(i)
+      do i = T,2,-1
+         beta(:,i-1) = matmul(beta(:,i)*B(:,observed(i)),At)/sigma(i)
       end do
       end subroutine
 
 subroutine gammapass(alpha,beta,gamma,N,T)
       integer :: N,T
-      real, dimension(0:N-1,0:T-1) :: alpha,beta,gamma
-      integer :: i
-      real totalsum
+      real, dimension(N,T) :: alpha,beta,gamma
+!      integer :: i
+!      real totalsum
 !f2py intent(out) :: gamma
 !f2py intent(hide), depend(alpha)  :: N = size(alpha,1)
 !f2py intent(hide), depend(alpha)  :: T = size(alpha,2)
 
       gamma = alpha*beta
-      do i = 0, T-1
-         totalsum= sum(gamma(:,i))
-         gamma(:,i) = gamma(:,i)/totalsum
-      end do
+!      do i = 1, T
+!         totalsum= sum(gamma(:,i))
+!         gamma(:,i) = gamma(:,i)/totalsum
+!      end do
       end subroutine
 
+! A(i,j) == Pr( hidden i -> hidden j)
+! B(i,j) == Pr( observed j | hidden i)
 subroutine generate_data(observed,hidden,pi,A,B,N,S,T)
       integer :: N, S, T
-      real, dimension(0:N-1):: pi
-      real, dimension(0:N-1,0:N-1):: A
-      real, dimension(0:S-1,0:N-1):: B
-      integer, dimension(0:T-1) :: observed,hidden
+      real, dimension(N):: pi
+      real, dimension(N,N):: A
+      real, dimension(N,S):: B
+      integer, dimension(T) :: observed,hidden
       integer :: i
 
 !f2py intent(out) :: observed, hidden
@@ -89,15 +96,15 @@ subroutine generate_data(observed,hidden,pi,A,B,N,S,T)
       call random_seed
 
       ! initial hidden state
-      call grn(pi,hidden(0))
+      call grn(pi,hidden(1))
 
       ! initial observed state
-      call grn(B(:,hidden(0)),observed(0))
+      call grn(B(hidden(1),:),observed(1))
 
       ! now do the rest of the sequence
-      do i = 1, T-1
-         call grn(A(:,hidden(i-1)),hidden(i))
-         call grn(B(:,hidden(i)),observed(i))
+      do i = 1, T
+         call grn(A(hidden(i-1),:),hidden(i))
+         call grn(B(hidden(i),:),observed(i))
       end do
       end subroutine
 
