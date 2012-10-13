@@ -102,11 +102,13 @@ subroutine generate_data(observed,hidden,pi,A,B,N,S,T)
       end subroutine
 
 subroutine grn(X, R)
-! generates a random number with value 0...len(X)-1
+! generates a random number with value 1...len(X)
       real, dimension(:) :: X
       real, dimension(:), allocatable :: cdf
       integer :: N, R, i
       real harvest
+!f2py intent(out) :: R
+
       N = size(X)
       allocate(cdf(N))
 
@@ -119,7 +121,7 @@ subroutine grn(X, R)
       call random_number(harvest)
       do i = 1, N
          if (harvest <= cdf(i)) then
-            R = i-1
+            R = i
             exit
          end if
       end do
