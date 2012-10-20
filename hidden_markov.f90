@@ -218,3 +218,32 @@ subroutine single_pass(A,B,pi,observed,gamma,digamma,N,T,S)
       & A,B,N,T,S)
       end subroutine
 
+! re-estimates pi, A, and B from (gamma,observed,digamma)
+subroutine reestimate_parameters(A,B,pi,observed,gamma,digamma)
+      integer :: N = size(A,1)
+      integer :: S = size(B,2)
+      integer :: T = len(observed)
+
+      real, dimension(N) :: pi
+      real, dimension(N,N) :: A
+      real, dimension(N,S) :: B
+      integer, dimension(T) :: observed
+      real, dimension(N,T) :: gamma
+      real, dimension(N,N) :: digamma
+
+      integer i,j
+      pi = gamma(:,0)
+      A = digamma
+      B = 0.
+
+      do i = 1, T
+            B(:,observed(i)) = B(:,observed(i)) + gamma(:,i)
+      end do
+
+      do i = 1, N
+         if (sum(B(i,:)) /= 0.) then
+            B(i,:) = B(i,:)/sum(B(i,:)
+         end if
+      end do
+    end subroutine reestimate_parameters
+
