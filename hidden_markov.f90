@@ -242,7 +242,7 @@ subroutine reestimate_parameters(A,B,pi,observed,gamma,digamma,N,S,T)
 
       do i = 1, N
          if (sum(B(i,:)) /= 0.) then
-            B(i,:) = B(i,:)/sum(B(i,:)
+            B(i,:) = B(i,:)/sum(B(i,:))
          end if
       end do
     end subroutine reestimate_parameters
