@@ -161,6 +161,39 @@ subroutine grn(X, R)
       return
       end subroutine
 
+! generates a random pi,A,B triplet for me.
+subroutine make_random(pi,A,B,N,S)
+      integer :: N
+      integer :: S
+      real, dimension(N) :: pi
+      real, dimension(N,N) :: A
+      real, dimension(N,S) :: B
+      integer :: x,y
+
+      call random_seed
+      do x = 1, N
+         call random_number(pi(x))
+      end do
+      pi = pi + 0.00000001
+      pi = pi/sum(pi)
+
+      do x = 1, N
+         do y = 1, N
+            call random_number(A(x,y))
+         end do
+         A(x,:) = A(x,:) +  0.00000001
+         A(x,:) = A(x,:)/sum(A(x,:))
+      end do
+
+      do x = 1, N
+         do y = 1, S
+            call random_number(B(x,y))
+         end do
+         B(x,:) = B(x,:) +  0.00000001
+         B(x,:) = B(x,:)/sum(B(x,:))
+      end do
+      end subroutine
+
 !     does a single pass for me
 subroutine single_pass(A,B,pi,observed,gamma,digamma,N,T,S)
       integer :: N
