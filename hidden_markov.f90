@@ -232,7 +232,7 @@ subroutine reestimate_parameters(A,B,pi,observed,gamma,digamma,N,S,T)
       real, dimension(N,N) :: digamma
 
       integer i,j
-      pi = gamma(:,0)
+      pi = gamma(:,1)
       A = digamma
       B = 0.
 
