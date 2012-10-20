@@ -161,3 +161,23 @@ subroutine grn(X, R)
       return
       end subroutine
 
+!     does a single pass for me
+subroutine single_pass(A,B,pi,observed,gamma,digamma)
+      real, dimension(:) :: pi
+      real, dimension(:,:) :: A,B,gamma,digamma
+      integer, dimension(:) :: observed
+
+      integer :: N = size(A,1)
+      integer :: T = len(observed)
+      integer :: S = size(B,2)
+      real, dimension(N,T) :: alpha, beta
+      real, dimension(T) :: sigma
+      integer i
+      alphapass(alpha,sigma,A,B,pi,observed,N,T,S)
+      betapass(beta,sigma,A,B,observed,N,T,S)
+      gamma = alpha*beta
+
+      call digammapass(alpha,beta,observed,digamma,&
+      & A,B,N,T,S)
+      end subroutine
+
