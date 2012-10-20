@@ -219,7 +219,7 @@ subroutine single_pass(A,B,pi,observed,gamma,digamma,N,T,S)
       end subroutine
 
 ! re-estimates pi, A, and B from (gamma,observed,digamma)
-subroutine reestimate_parameters(A,B,pi,observed,gamma,digamma,N,S,T)
+subroutine reestimate_parameters(A,B,pi,observed,gamma,digamma,N,T,S)
       integer :: N
       integer :: S
       integer :: T
