@@ -1,3 +1,6 @@
+! alpha(i,t) = Pr(hidden_t = i | obs_1,...,obs_t)
+! beta(i,t)  = Pr(obs_t+1,...,obs_T| hidden_t = i)*Pr(o_1,...,o_t)/Pr(o_1,...,o_T)
+! gamma(i,t)  = Pr(hidden_t = i | obs_1,...,obs_T)
 ! A(i,j) == Pr( hidden i -> hidden j)
 ! B(i,j) == Pr( observed j | hidden i)
 
