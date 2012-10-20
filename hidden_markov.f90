@@ -61,6 +61,28 @@ subroutine betapass(beta,sigma,A,B,observed,N,T,S)
       end do
       end subroutine
 
+! Reestimates Pr(i -> j)
+subroutine digammapass(alpha,beta,observed,digamma,A,B,N,T,S)
+! Pr(x_t=i,x_t+1=j|o_1,...,o_T) = alpha_t^(i)A_ijbeta_^t+1(j)b(j,o_t+1)
+
+      integer :: N,T,S
+      real, dimension(N,T) :: alpha,beta
+      real, dimension(N,N):: A,digamma
+      real, dimension(N,S):: B
+      integer, dimension(T) ::  observed
+      integer :: i,j,k
+      real, dimension(N) :: vecj
+      digamma = 0.
+      do k = 1,T-1
+         do j = 1,N
+            digamma(:,j) = digamma(:,j) + alpha(:,k)*A(:,j)*B(j,observed(k+1))*beta(j,k+1)
+         end do
+      end do
+
+      digamma = digamma/T-1
+      end subroutine
+
+
 subroutine gammapass(alpha,beta,gamma,N,T)
       integer :: N,T
       real, dimension(N,T) :: alpha,beta,gamma
