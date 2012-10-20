@@ -247,3 +247,39 @@ subroutine reestimate_parameters(A,B,pi,observed,gamma,digamma,N,T,S)
       end do
     end subroutine reestimate_parameters
 
+! estimates pi, A, and B for me from observed data.
+subroutine estimate_parameters(pi,A,B,observed,&
+     & N,T,S,iterations)
+      integer, optional, intent(in) :: iterations
+      integer :: iters
+      integer:: N,S,T
+      real, dimension(N) :: pi
+      real, dimension(N,N) :: A
+      real, dimension(N,S) :: B
+      integer, dimension(T) :: observed
+      integer :: tt
+      real, dimension(N,T) :: gamma
+      real, dimension(N,N) :: digamma
+
+      real, dimension(N) :: estimated_pi
+      real, dimension(N,N) :: estimated_A
+      real, dimension(N,S) :: estimated_B
+
+!f2py intent(hide), depend(observed) :: S = max(observed)
+
+      if (present(iterations)) then
+         iters = iterations
+      else
+         iters = 100
+      end if
+
+! start with random data
+      call make_random(pi,A,B,N,S)
+      do tt = 1, iters
+         call single_pass(A,B,pi,observed,&
+              &gamma,digamma,N,T,S)
+         call reestimate_parameters(A,B,pi,observed,&
+              &gamma,digamma,N,T,S)
+      end do
+
+    end subroutine estimate_parameters
