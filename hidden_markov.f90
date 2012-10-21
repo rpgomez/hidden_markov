@@ -70,8 +70,8 @@ subroutine digammapass(alpha,beta,observed,digamma,A,B,N,T,S)
       real, dimension(N,N):: A,digamma
       real, dimension(N,S):: B
       integer, dimension(T) ::  observed
-      integer :: i,j,k
-      real, dimension(N) :: vecj
+      integer :: j,k
+
       digamma = 0.
       do k = 1,T-1
          do j = 1,N
@@ -209,7 +209,6 @@ subroutine single_pass(A,B,pi,observed,gamma,digamma,N,T,S)
       real, dimension(N,T) :: alpha,beta
       real, dimension(T) :: sigma
 
-      integer i
       call alphapass(alpha,sigma,A,B,pi,observed,N,T,S)
       call betapass(beta,sigma,A,B,observed,N,T,S)
       gamma = alpha*beta
@@ -231,7 +230,7 @@ subroutine reestimate_parameters(A,B,pi,observed,gamma,digamma,N,T,S)
       real, dimension(N,T) :: gamma
       real, dimension(N,N) :: digamma
 
-      integer i,j
+      integer i
       pi = gamma(:,1)
       A = digamma
       B = 0.
@@ -260,10 +259,6 @@ subroutine estimate_parameters(pi,A,B,observed,&
       integer :: tt
       real, dimension(N,T) :: gamma
       real, dimension(N,N) :: digamma
-
-      real, dimension(N) :: estimated_pi
-      real, dimension(N,N) :: estimated_A
-      real, dimension(N,S) :: estimated_B
 
 !f2py intent(hide), depend(observed) :: S = max(observed)
 
