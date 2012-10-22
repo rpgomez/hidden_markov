@@ -273,11 +273,23 @@ subroutine estimate_parameters(pi,A,B,observed,&
       real, dimension(N,N) :: A
       real, dimension(N,S) :: B
       integer, dimension(T) :: observed
-      integer :: tt
-      real, dimension(N,T) :: gamma
-      real, dimension(N,N) :: digamma
 
-!f2py intent(hide), depend(observed) :: S = max(observed)
+      interface
+         subroutine reestimate_parameters(A,B,pi,observed,N,T,S,iterations)
+           integer :: N
+           integer :: S
+           integer :: T
+           integer, optional, intent(in) :: iterations
+           real, dimension(N) :: pi
+           real, dimension(N,N) :: A
+           real, dimension(N,S) :: B
+           integer, dimension(T) :: observed
+
+         end subroutine reestimate_parameters
+      end interface
+
+!f2py intent(hide), depend(observed) :: T = size(observed)
+!f2py intent(out) :: pi, A, B
 
       if (present(iterations)) then
          iters = iterations
@@ -287,11 +299,5 @@ subroutine estimate_parameters(pi,A,B,observed,&
 
 ! start with random data
       call make_random(pi,A,B,N,S)
-      do tt = 1, iters
-         call single_pass(A,B,pi,observed,&
-              &gamma,digamma,N,T,S)
-         call reestimate_parameters(A,B,pi,observed,&
-              &gamma,digamma,N,T,S)
-      end do
-
+      call reestimate_parameters(A,B,pi,observed,N,T,S,iters)
     end subroutine estimate_parameters
