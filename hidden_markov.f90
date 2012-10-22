@@ -79,7 +79,7 @@ subroutine digammapass(alpha,beta,observed,digamma,A,B,N,T,S)
          end do
       end do
 
-      digamma = digamma/T-1
+      digamma = digamma/(T-1)
       end subroutine
 
 
