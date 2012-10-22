@@ -233,19 +233,33 @@ subroutine reestimate_parameters(A,B,pi,observed,N,T,S,iterations)
       real, dimension(N,T) :: gamma
       real, dimension(N,N) :: digamma
 
-      integer i
-      pi = gamma(:,1)
-      A = digamma
-      B = 0.
+      integer i,tt
 
-      do i = 1, T
+!f2py intent(hidden), depend(pi) :: N = size(pi)
+!f2py intent(hidden), depend(B)  :: S = size(B,2)
+!f2py intent(hidden), depend(observed) :: T =size(observed)
+
+      if (present(iterations)) then
+         iters = iterations
+      else
+         iters = 1
+      end if
+
+      do tt = 1, iters
+         call single_pass(A,B,pi,observed,gamma,digamma,N,T,S)
+         pi = gamma(:,1)
+         A = digamma
+         B = 0.
+
+         do i = 1, T
             B(:,observed(i)) = B(:,observed(i)) + gamma(:,i)
-      end do
+         end do
 
-      do i = 1, N
-         if (sum(B(i,:)) /= 0.) then
-            B(i,:) = B(i,:)/sum(B(i,:))
-         end if
+         do i = 1, N
+            if (sum(B(i,:)) /= 0.) then
+               B(i,:) = B(i,:)/sum(B(i,:))
+            end if
+         end do
       end do
     end subroutine reestimate_parameters
 
