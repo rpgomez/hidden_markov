@@ -219,12 +219,13 @@ subroutine single_pass(A,B,pi,observed,gamma,digamma,N,T,S)
       & A,B,N,T,S)
       end subroutine
 
-! re-estimates pi, A, and B from (gamma,observed,digamma)
-subroutine reestimate_parameters(A,B,pi,observed,gamma,digamma,N,T,S)
+! re-estimates pi, A, and B from observed
+subroutine reestimate_parameters(A,B,pi,observed,N,T,S,iterations)
       integer :: N
       integer :: S
       integer :: T
-
+      integer, optional, intent(in) :: iterations
+      integer :: iters
       real, dimension(N) :: pi
       real, dimension(N,N) :: A
       real, dimension(N,S) :: B
