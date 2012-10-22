@@ -170,6 +170,8 @@ subroutine make_random(pi,A,B,N,S)
       real, dimension(N,S) :: B
       integer :: x,y
 
+
+!f2py intent(out) :: pi,A,B
       call random_seed
       do x = 1, N
          call random_number(pi(x))
