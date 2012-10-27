@@ -105,6 +105,27 @@ subroutine gammapass(alpha,beta,gamma,N,T)
 !      end do
       end subroutine
 
+! computes gamma directly for me.
+subroutine gammaoneshot(gamma,pi,A,B,observed,N,T,S)
+      integer :: N,T,S
+      real, dimension(N,N) :: A
+      real, dimension(N,S) :: B
+      real, dimension(N) :: pi
+      integer, dimension(T) :: observed
+      real, dimension(T) :: sigma
+
+      real, dimension(N,T) :: alpha,beta,gamma
+
+!f2py intent(out) :: gamma
+!f2py intent(hide), depend(A)  :: N = size(A,1)
+!f2py intent(hide), depend(B)  :: S = size(B,2)
+!f2py intent(hide), depend(observed) :: T = size(observed)
+      call alphapass(alpha,sigma,A,B,pi,observed,N,T,S)
+      call betapass(beta,sigma,A,B,observed,N,T,S)
+
+      gamma = alpha*beta
+      end subroutine
+
 ! A(i,j) == Pr( hidden i -> hidden j)
 ! B(i,j) == Pr( observed j | hidden i)
 subroutine generate_data(observed,hidden,pi,A,B,N,S,T)
