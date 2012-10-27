@@ -126,6 +126,21 @@ subroutine gammaoneshot(gamma,pi,A,B,observed,N,T,S)
       gamma = alpha*beta
       end subroutine
 
+subroutine init_random_seed()
+      integer :: i, n, clock
+      integer, dimension(:), allocatable :: seed
+
+      call random_seed(size = n)
+      allocate(seed(n))
+
+      call system_clock(count=clock)
+
+      seed = clock + 37 * (/ (i - 1, i = 1, n) /)
+      call random_seed(put = seed)
+
+      deallocate(seed)
+      end subroutine init_random_seed
+
 ! A(i,j) == Pr( hidden i -> hidden j)
 ! B(i,j) == Pr( observed j | hidden i)
 subroutine generate_data(observed,hidden,pi,A,B,N,S,T)
@@ -145,7 +160,7 @@ subroutine generate_data(observed,hidden,pi,A,B,N,S,T)
          integer :: R
          end subroutine grn
       end interface
-      call random_seed
+      call init_random_seed()
 
       ! initial hidden state
       call grn(pi,hidden(1))
@@ -199,7 +214,7 @@ subroutine make_random(pi,A,B,N,S)
 
 
 !f2py intent(out) :: pi,A,B
-      call random_seed
+      call init_random_seed()
       do x = 1, N
          call random_number(pi(x))
       end do
