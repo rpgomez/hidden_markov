@@ -68,7 +68,7 @@ def digammapass(alpha,beta,gamma,observed,sigma,digamma,A,B):
     for t in range(0,T-1):
         digammatemp[:] = 0
         for j in range(N):
-            digammatemp[:,j] = alpha[:,t]*A[j,:]*B[j,observed[t+1]]*beta[j,t+1]
+            digammatemp[j,:] = alpha[:,t]*A[j,:]*B[j,observed[t+1]]*beta[j,t+1]
 
         digammatemp = digammatemp/sigma[t+1]
         digamma[:] += digammatemp
