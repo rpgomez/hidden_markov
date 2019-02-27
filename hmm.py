@@ -51,6 +51,12 @@ def betapass(beta,sigma,A,B,observed):
 
 def digammapass(alpha,beta,gamma,observed,sigma,digamma,A,B):
     """
+    alpha(i,t) = Pr(hidden_t = i | obs_1,...,obs_t)
+    beta(i,t)  = Pr(obs_t+1,...,obs_T| hidden_t = i)*Pr(o_1,...,o_t)/Pr(o_1,...,o_T)
+    gamma(i,t)  = Pr(hidden_t = i | obs_1,...,obs_T)
+    A(j,i) == Pr( hidden i -> hidden j)
+    B(i,j) == Pr( observed j | hidden i)
+
     Reestimates Pr(i -> j)
     Pr(x_t=i,x_t+1=j|o_1,...,o_T) = alpha_t^(i)A_jibeta_^t+1(j)b(j,o_t+1)
     """
