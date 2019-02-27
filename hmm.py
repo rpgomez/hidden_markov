@@ -73,8 +73,9 @@ def digammapass(alpha,beta,gamma,observed,sigma,digamma,A,B):
         digammatemp = digammatemp/sigma[t+1]
         digamma[:] += digammatemp
 
-    for n in range(N):
-        digamma[:,n] = digamma[:,n]/gamma[n,:T-1].sum()
+    digamma = digamma/digamma.sum(axis=0).reshape(1,-1)
+    #for n in range(N):
+    #    digamma[:,n] = digamma[:,n]/gamma[n,:T-1].sum()
 
 def gammapass(alpha,beta,gamma):
     N,T = alpha.shape
