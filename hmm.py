@@ -46,7 +46,7 @@ def betapass(beta,sigma,A,B,observed):
 
     # now do the remainder
     for t in range(T-1,0,-1):
-        beta[:,t-1] = At.dot(beta[:,t]*B[:,observed[i]])/sigma[t]
+        beta[:,t-1] = At.dot(beta[:,t]*B[:,observed[t]])/sigma[t]
 
 
 def digammapass(alpha,beta,gamma,observed,sigma,digamma,A,B):
