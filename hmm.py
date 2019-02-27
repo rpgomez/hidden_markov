@@ -97,15 +97,11 @@ def gammaoneshot(gamma,pi,A,B,observed,sigma):
 def make_random(N,S):
     """generates a random pi,A,B triplet for me."""
 
-      real, dimension(N) :: pi
-      real, dimension(N,N) :: A
-      real, dimension(N,S) :: B
-      integer :: x,y
-      pi = np.random.(np.ones(N))
-      A  = np.random.(np.ones(N),N).transpose()
-      B  = np.random.(np.ones(S),N)
+    pi = np.random.dirichlet(np.ones(N))
+    A  = np.random.dirichlet(np.ones(N),N).transpose()
+    B  = np.random.dirichlet(np.ones(S),N).transpose()
 
-      return pi,A,B
+    return pi,A,B
   
 def single_pass(A,B,pi,observed,gamma,digamma):
     """computes alpha, beta, gamma, digamma passes """
