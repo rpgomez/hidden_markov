@@ -60,20 +60,21 @@ def digammapass(alpha,beta,gamma,observed,sigma,digamma,A,B):
     Reestimates Pr(i -> j)
     Pr(x_t=i,x_t+1=j|o_1,...,o_T) = alpha_t^(i)A_jibeta_^t+1(j)b(j,o_t+1)
     """
-      N,T = alpha.shape
-      S = B.shape[1]
-      digamma[:] = 0
-      digammatemp = np.zeros((N,N))
-      for t in range(0,T-1):
-         digammatemp[:] = 0
-         for j in range(N):
+
+    N,T = alpha.shape
+    S = B.shape[1]
+    digamma[:] = 0
+    digammatemp = np.zeros((N,N))
+    for t in range(0,T-1):
+        digammatemp[:] = 0
+        for j in range(N):
             digammatemp[:,j] = alpha[:,t]*A[j,:]*B[j,observed[t+1]]*beta[j,t+1]
 
-         digammatemp = digammatemp/sigma[t+1]
-         digamma[:] += digammatemp
+        digammatemp = digammatemp/sigma[t+1]
+        digamma[:] += digammatemp
 
-      for n in range(N):
-         digamma[:,n] = digamma[:,n]/gamma[n,:T-1].sum()
+    for n in range(N):
+        digamma[:,n] = digamma[:,n]/gamma[n,:T-1].sum()
 
 def gammapass(alpha,beta,gamma):
     N,T = alpha.shape
