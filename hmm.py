@@ -131,6 +131,13 @@ def single_pass(A,B,pi,observed,gamma,digamma):
     """computes alpha, beta, gamma, digamma passes and returns log
     likelihood."""
 
+    N,S = B.shape
+    T = observed.shape[0]
+    sigma = zeros(T)
+    alpha = zeros((N,T))
+    beta  = zeros((N,T))
+    digamma = zeros((N,N))
+
     gammaoneshot(gamma,pi,A,B,observed,sigma)
     digammapass(alpha,beta,gamma,observed,sigma,digamma)
 
