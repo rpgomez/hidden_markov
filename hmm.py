@@ -82,7 +82,35 @@ def gammapass(alpha,beta,gamma):
 
     gamma[:,:] = alpha*beta
 
+def update_B(B,gamma, observed):
+    """ Updates Belief on B """
+    N, S = B.shape
+    T = observed.shape[0]
 
+    B_new = np.zeros((N,S))
+
+    for t in range(T):
+        B_new[:,observed[t]] += gamma[:,t]
+
+    B_new = B_new/B_new.sum(axis=1).reshape(-1,1)
+    B[:] = B_new
+
+def update_pi(pi,gamma):
+    """ Updates belief on pi """
+    pi[:] = gamma[:,0]
+    
+def update_parameters(alpha,beta,gamma, pi, A,B,observed,sigma):
+    """ Updates pi, A,B from observed data. """
+
+    N,S = B.shape
+    digamma = np.zeros((N,N))
+    digammapass(alpha, beta, gamma, observed,sigma,digamma, A,B)
+
+    update_B(B,gamma,observed)
+    update_pi(pi,gamma)
+
+    A[:] = digamma[:]
+    
 def gammaoneshot(gamma,pi,A,B,observed,sigma):
     """ computes gamma directly for me. """
 
@@ -110,6 +138,8 @@ def single_pass(A,B,pi,observed,gamma,digamma):
     gammaoneshot(gamma,pi,A,B,observed,sigma)
     digammapass(alpha,beta,gamma,observed,sigma,digamma)
 
+def compute_likelihood(sigma):
+    return log(sigma).sum()
 
 def reestimate_parameters(A,B,pi,observed,halting_criteria=1e-6):
     """re-estimates pi, A, and B from observed"""
