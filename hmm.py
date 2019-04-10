@@ -114,10 +114,6 @@ def update_parameters(alpha,beta,gamma, pi, A,B,observed,sigma):
 def gammaoneshot(gamma,pi,A,B,observed,sigma):
     """ computes gamma directly for me. """
 
-    N = A.shape[0]
-    S = B.shape[1]
-    T = observed.shape[0]
-
     alphapass(alpha,sigma,A,B,pi,observed)
     betapass(beta,sigma,A,B,observed)
     gammapass(alpha,beta,gamma)
