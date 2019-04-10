@@ -141,24 +141,27 @@ def single_pass(A,B,pi,observed,gamma,digamma):
 def compute_likelihood(sigma):
     return log(sigma).sum()
 
-def reestimate_parameters(A,B,pi,observed,halting_criteria=1e-6):
+def reestimate_parameters(A,B,pi,observed,halting_criteria=1e-6,debug=False):
     """re-estimates pi, A, and B from observed"""
 
+    N, S = B.shape
+    T = observed.shape[0]
+    alpha = zeros((N,T))
+    beta  = zeros((N,T))
+    gamma = zeros((N,T))
+    sigma = zeros(T)
 
-      do tt = 1, iters
-         call single_pass(A,B,pi,observed,gamma,digamma,N,T,S)
-         pi = gamma(:,1)
-         A = digamma
-         B = 0.
+    current_score = -np.inf
+    gammaoneshot(gamma,pi,A,B,observed,sigma)
+    new_score = compute_likelihood(sigma)
+    diff = new_score - current_score
+    while diff > halting_criteria:
+        current_score = new_score
+        update_parameters(alpha,beta,gamma, pi, A,B,observed,sigma)
+        gammaoneshot(gamma,pi,A,B,observed,sigma)
+        new_score = compute_likelihood(sigma)
+        diff = new_score - current_score
+        if debug:
+            print("diff = ", diff)
 
-         do i = 1, T
-            B(:,observed(i)) = B(:,observed(i)) + gamma(:,i)
-         end do
-
-         do i = 1, N
-            if (sum(B(i,:)) /= 0.) then
-               B(i,:) = B(i,:)/sum(B(i,:))
-            end if
-         end do
-      end do
-    end subroutine reestimate_parameters
+    
