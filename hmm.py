@@ -111,7 +111,7 @@ def update_parameters(alpha,beta,gamma, pi, A,B,observed,sigma):
 
     A[:] = digamma[:]
     
-def gammaoneshot(gamma,pi,A,B,observed,sigma):
+def gammaoneshot(alpha, beta, gamma,pi,A,B,observed,sigma):
     """ computes gamma directly for me. """
 
     alphapass(alpha,sigma,A,B,pi,observed)
@@ -138,7 +138,7 @@ def single_pass(A,B,pi,observed,gamma,digamma):
     beta  = zeros((N,T))
     digamma = zeros((N,N))
 
-    gammaoneshot(gamma,pi,A,B,observed,sigma)
+    gammaoneshot(alpha,beta, gamma,pi,A,B,observed,sigma)
     digammapass(alpha,beta,gamma,observed,sigma,digamma)
 
 def compute_likelihood(sigma):
@@ -155,13 +155,13 @@ def reestimate_parameters(A,B,pi,observed,halting_criteria=1e-6,debug=False):
     sigma = zeros(T)
 
     current_score = -np.inf
-    gammaoneshot(gamma,pi,A,B,observed,sigma)
+    gammaoneshot(alpha, beta, gamma,pi,A,B,observed,sigma)
     new_score = compute_likelihood(sigma)
     diff = new_score - current_score
     while diff > halting_criteria:
         current_score = new_score
         update_parameters(alpha,beta,gamma, pi, A,B,observed,sigma)
-        gammaoneshot(gamma,pi,A,B,observed,sigma)
+        gammaoneshot(alpha,beta,gamma,pi,A,B,observed,sigma)
         new_score = compute_likelihood(sigma)
         diff = new_score - current_score
         if debug:
