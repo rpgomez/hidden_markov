@@ -133,10 +133,10 @@ def single_pass(A,B,pi,observed,gamma,digamma):
 
     N,S = B.shape
     T = observed.shape[0]
-    sigma = zeros(T)
-    alpha = zeros((N,T))
-    beta  = zeros((N,T))
-    digamma = zeros((N,N))
+    sigma = np.zeros(T)
+    alpha = np.zeros((N,T))
+    beta  = np.zeros((N,T))
+    digamma = np.zeros((N,N))
 
     gammaoneshot(alpha,beta, gamma,pi,A,B,observed,sigma)
     digammapass(alpha,beta,gamma,observed,sigma,digamma)
@@ -149,10 +149,10 @@ def reestimate_parameters(A,B,pi,observed,halting_criteria=1e-6,debug=False):
 
     N, S = B.shape
     T = observed.shape[0]
-    alpha = zeros((N,T))
-    beta  = zeros((N,T))
-    gamma = zeros((N,T))
-    sigma = zeros(T)
+    alpha = np.zeros((N,T))
+    beta  = np.zeros((N,T))
+    gamma = np.zeros((N,T))
+    sigma = np.zeros(T)
 
     current_score = -np.inf
     gammaoneshot(alpha, beta, gamma,pi,A,B,observed,sigma)
