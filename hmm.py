@@ -31,7 +31,18 @@ def generate_data(pi,A,B,T = 100):
     return X_t,Y_t
 
 
-@numba.njit()
+alphasig = "float64[:,:]"
+betasig  = "float64[:,:]"
+gammasig = "float64[:,:]"
+digammasig = "float64[:,:]"
+sigmasig = "float64[:]"
+Asig = alphasig
+Bsig = alphasig
+pisig = sigmasig
+obsig = "int32[:]"
+
+ap_sig = "void(" + ",".join([alphasig,sigmasig,Asig,Bsig,pisig,obsig])+")"
+@numba.jit(ap_sig,nopython=True,nogil=True,cache=True)
 def alphapass(alpha,sigma,A,B,pi,observed):
     """
     alpha(t,i) = Pr(hidden_t = i | obs_1,...,obs_t)
@@ -58,7 +69,8 @@ def alphapass(alpha,sigma,A,B,pi,observed):
         alpha[t] /= sigma[t]
 
 
-@numba.njit()
+bp_sig = "void(" + ",".join([betasig,sigmasig,Asig,Bsig,obsig]) + ")"
+@numba.jit(bp_sig,nopython=True,nogil=True,cache=True)
 def betapass(beta,sigma,A,B,observed):
     """
     A(j,i) == Pr( hidden i -> hidden j)
@@ -77,12 +89,14 @@ def betapass(beta,sigma,A,B,observed):
     for t in range(T-1,0,-1):
         beta[t-1] = np.dot(At,beta[t]*B[:,observed[t]])/sigma[t]
 
-@numba.njit()
+gp_sig = "void(" + ",".join([alphasig,betasig,gammasig]) + ")"
+@numba.jit(gp_sig,nopython=True,nogil=True,cache=True)
 def gammapass(alpha,beta,gamma):
     gamma[:,:] = alpha*beta
 
 
-@numba.njit()
+uB_sig = "void(" + ",".join([Bsig,gammasig,obsig]) + ")"
+@numba.jit(uB_sig,nopython=True,nogil=True,cache=True)
 def update_B(B,gamma, observed):
     """ Updates belief on B """
     N, S = B.shape
@@ -100,7 +114,9 @@ def update_pi(pi,gamma):
     """ Updates belief on pi """
     pi[:] = gamma[0]
 
-@numba.njit()
+dp_pass = "void(" + ",".join([alphasig,betasig,gammasig,\
+                              obsig,sigmasig,digammasig,Asig,Bsig]) + ")"
+@numba.jit(dp_pass,nopython=True,nogil=True,cache=True)
 def digammapass(alpha,beta,gamma,observed,sigma,digamma,A,B):
     """
     Computes an updated version of A based on the observed sequence of data.
@@ -141,7 +157,9 @@ def update_parameters(alpha,beta,gamma, pi, A,B,observed,sigma):
 
     A[:] = digamma[:]
 
-@numba.njit()
+gos_sig = "void(" + ",".join([alphasig,betasig,gammasig,pisig,\
+                              Asig,Bsig,obsig,sigmasig]) + ")"
+@numba.jit(gos_sig,nopython=True,nogil=True,cache=True)
 def gammaoneshot(alpha,beta,gamma,pi,A,B,observed,sigma):
     """ computes alpha, beta, and gamma directly for me. """
 
@@ -257,7 +275,7 @@ class hmm():
         unique.sort()
         self.map = dict([(y,t) for t,y in enumerate(unique)])
         self.inv_map = dict([(t,y) for t,y in enumerate(unique)])
-        self.Y_t = np.array([self.map[y] for y in observed])
+        self.Y_t = np.array([self.map[y] for y in observed],dtype=np.int32)
         self.S = len(self.map)
         self.T = len(self.Y_t)
 
