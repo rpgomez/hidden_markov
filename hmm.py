@@ -1,7 +1,7 @@
 import numpy as np
 import numba
 import scipy.stats as st
-
+from tqdm.autonotebook import tqdm # progress bar
 
 def make_random(N,S):
     """generates a random pi,A,B triplet for me."""
@@ -185,8 +185,21 @@ def compute_loglikelihood_parameters(pi,A,B,observed):
     return score
 
 def reestimate_parameters(A,B,pi,observed,
-                          halting_criteria=1e-6,debug=False):
+                          halting_criteria=1e-6,
+                          debug=False,verbose=True):
     """re-estimates pi, A, and B from the observed sequence."""
+
+    if verbose:
+        progress_bar = tqdm(total=float('inf'),desc='loglike diff')
+    else:
+        class fake_tqdm():
+            def __init__(self):
+                return
+
+            def update(self,x):
+                return
+        progress_bar = fake_tqdm()
+
     N, S = B.shape
     T = observed.shape[0]
     alpha = np.zeros((T,N))
@@ -198,12 +211,17 @@ def reestimate_parameters(A,B,pi,observed,
     gammaoneshot(alpha,beta,gamma,pi,A,B,observed,sigma)
     new_score = compute_loglikelihood(sigma)
     diff = new_score - current_score
+
     while diff > halting_criteria:
         current_score = new_score
         update_parameters(alpha,beta,gamma, pi, A,B,observed,sigma)
         gammaoneshot(alpha,beta,gamma,pi,A,B,observed,sigma)
         new_score = compute_loglikelihood(sigma)
         diff = new_score - current_score
+        if verbose:
+            if not np.isinf(diff):
+                progress_bar.update(diff)
+
         if debug:
             print("diff = ", diff)
 
@@ -290,7 +308,8 @@ class hmm():
                 self.B = np.random.dirichlet(np.ones(self.S),size=self.N)
 
         reestimate_parameters(self.A,self.B,self.pi,self.Y_t,
-                              halting_criteria=self.halting_criteria)
+                              halting_criteria=self.halting_criteria,
+                              verbose=verbose)
         self._called_fit = True
     def transform(self):
         """Takes the observed data mapped to (Y_t) and then projected to the
