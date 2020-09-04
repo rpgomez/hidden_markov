@@ -252,6 +252,35 @@ def determine_number_of_hidden_states(Y_t,halting_criteria=1e-6,verbose=False):
             print("N=",N,"df: ", df, "Lamda: ", lam, "p: ", p)
     return N-1
 
+def viterbi_algorithm(pi,A,B,Y,verbose=False):
+    """Computes the most probable path for the hidden sequence (X_t)
+    returns the score, and path as a list of hidden state values."""
+
+    N = A.shape[0]
+    T = len(Y)
+
+    logA = np.log(A)
+    logB = np.log(B)
+    logpi = np.log(pi)
+    # start with t=0
+    paths = [[logpi[n]+logB[n,Y[0]],[n]] for n in range(N)]
+
+    # now recurse until t = T-1
+    for t in range(1, T):
+        new_paths = [[] for n in range(N)]
+        for n in range(N):
+            scores = np.array([ paths[i][0] + logA[n,i] for i in range(N)])
+            i = scores.argmax()
+            new_score = scores.max() + logB[n,Y[t]]
+            new_paths[n] = [new_score,paths[i][1] + [n]]
+
+        paths = new_paths
+
+    total_scores = np.array([x[0] for x in paths])
+    best_score = total_scores.max()
+    best_path = paths[total_scores.argmax()][1]
+    return best_score, best_path
+
 class hmm():
     """This class is intended to mimic the machine learning algorithms implemented in
     Scikit-Learn. It's intended to make it as easy as possible to recover the
@@ -333,6 +362,14 @@ class hmm():
 
         self.fit(observed,verbose=verbose)
         return self.transform()
+    def viterbi(self):
+        """Computes the most probable sequence of hidden states and returns
+        the sequence
+
+        """
+
+        best_score, path = viterbi_algorithm(self.pi, self.A,self.B,self.Y_t)
+        return path
 
     def compute_loglikelihood(self):
         """ Computes log Pr(Y_0,...,Y_T| pi, A, B) """
