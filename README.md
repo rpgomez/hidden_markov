@@ -7,7 +7,7 @@ computed and updated.
 ## Installation:
 
 1. Clone this package.
-2. pip install .
+2. Use either *pip install .* or preferably *uv pip install .*
 
 ## Usage:
 
@@ -15,10 +15,10 @@ computed and updated.
 2. Instantiate a hmm object to fit your data:
 
 ```python
-import hmm
+import hidden_markov
 
 # instantiate a model with 5 hidden states
-my_model = hmm.hmm(num_hiddenstates=5)
+my_model = hidden_markov.hmm(num_hiddenstates=5)
 
 # fit the model to the data
 my_model.fit(y_n)
