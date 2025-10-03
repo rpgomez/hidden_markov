@@ -1,0 +1,18 @@
+[project]
+name = "hidden-markov"
+version = "0.1.0"
+description = "Provides a Hidden Markov Model for categorical data"
+authors = [
+    { name = "Rodrigo P. Gomez", email = "armyofthepenguin@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "numba>=0.62.1",
+    "numpy>=2.3.3",
+    "scipy>=1.16.2",
+    "tqdm>=4.67.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
